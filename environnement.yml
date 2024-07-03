@@ -1,0 +1,16 @@
+name: solid
+
+channels:
+  - defaults
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - geopandas=0.14.2
+  - py7zr=0.20.5
+  - pandera=0.20.1
+  - openpyxl=3.1.4
+  - pip
+
+  - pip:
+    - synpp==1.5.0

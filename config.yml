@@ -1,0 +1,15 @@
+working_directory: .cache
+
+run:
+  # - data.sirene.download_siret
+  # - data.sirene.download_siren
+  # - data.sirene.download_geoloc
+  # - data.sirene.raw_siren
+  - data.sirene.localized
+
+config:
+  processes : 8
+
+  regions: []
+  departments: [44]
+  municipalities: []
