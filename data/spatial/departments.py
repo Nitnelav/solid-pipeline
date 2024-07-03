@@ -11,7 +11,7 @@ def configure(context):
     context.stage("data.spatial.municipalities")
 
 def execute(context):
-    df_departements = context.stage("data.spatial.municipalities").dissolve(
-        by = "departement_id").drop(columns = ["commune_id", "has_iris"]).reset_index()
+    df_departments = context.stage("data.spatial.municipalities").dissolve(
+        by = "department_id").drop(columns = ["municipality_id", "has_iris"]).reset_index()
 
-    return df_departements
+    return df_departments

@@ -6,14 +6,14 @@ This stage loads the raw data from the French enterprise registry.
 """
 
 def configure(context):
-    context.stage("data.sirene.download_siren")
-    context.stage("data.sirene.raw_siret")
+    context.stage("data.sirene.download.siren")
+    context.stage("data.sirene.raw.siret")
 
 def execute(context):
-    relevant_siren = context.stage("data.sirene.raw_siret")["siren"].unique()
+    relevant_siren = context.stage("data.sirene.raw.siret")["siren"].unique()
     df_siren = []
 
-    siren_file = "%s/%s" % (context.path("data.sirene.download_siren"), context.stage("data.sirene.download_siren"))
+    siren_file = "%s/%s" % (context.path("data.sirene.download.siren"), context.stage("data.sirene.download.siren"))
 
     COLUMNS_DTYPES = {
         "siren":"int32", 

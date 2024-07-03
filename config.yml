@@ -1,15 +1,20 @@
 working_directory: .cache
 
 run:
-  # - data.sirene.download_siret
-  # - data.sirene.download_siren
-  # - data.sirene.download_geoloc
-  # - data.sirene.raw_siren
-  - data.sirene.localized
+  # - data.sirene.download.siret
+  # - data.sirene.download.siren
+  # - data.sirene.download.geoloc
+  # - data.sirene.raw.siren
+  # - data.sirene.localized
+  # - data.sirene.cleaned.horizon
+  - data.sirene.cleaned.compare
+
 
 config:
   processes : 8
 
   regions: []
   departments: [44]
-  municipalities: []
+  municipalities: [44109]
+
+  sirene_cleaning_method: "horizon"

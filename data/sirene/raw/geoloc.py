@@ -6,13 +6,13 @@ This stage loads the geolocalization data for the French enterprise registry.
 """
 
 def configure(context):
-    context.stage("data.sirene.download_geoloc")
+    context.stage("data.sirene.download.geoloc")
     context.stage("data.spatial.codes")
 
 def execute(context):
-    # Filter by departement
+    # Filter by department
     df_codes = context.stage("data.spatial.codes")
-    requested_departements = set(df_codes["departement_id"].unique())
+    requested_departments = set(df_codes["department_id"].unique())
     
     COLUMNS_DTYPES = {
         "siret":"int64", 
@@ -21,7 +21,7 @@ def execute(context):
         "plg_code_commune":"str",
     }
 
-    geoloc_file = "%s/%s" % (context.path("data.sirene.download_geoloc"), context.stage("data.sirene.download_geoloc"))
+    geoloc_file = "%s/%s" % (context.path("data.sirene.download.geoloc"), context.stage("data.sirene.download.geoloc"))
     df_siret_geoloc = pd.DataFrame(columns=["siret","x","y"])
     
     with context.progress(label = "Reading geolocalized SIRET ...") as progress:
@@ -33,9 +33,9 @@ def execute(context):
             
             f = df_chunk["siret"].isna() # Just to get a mask
             
-            for departement in requested_departements:
+            for department in requested_departments:
 
-                f |= df_chunk["plg_code_commune"].str.startswith(departement)
+                f |= df_chunk["plg_code_commune"].str.startswith(department)
 
             df_siret_geoloc = pd.concat([df_siret_geoloc, df_chunk[f]],ignore_index=True)
 

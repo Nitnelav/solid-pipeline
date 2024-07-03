@@ -6,17 +6,17 @@ This stage loads the raw data from the French enterprise registry.
 """
 
 def configure(context):
-    context.stage("data.sirene.download_siret")
+    context.stage("data.sirene.download.siret")
     context.stage("data.spatial.codes")
 
 def execute(context):
-    # Filter by departement
+    # Filter by department
     df_codes = context.stage("data.spatial.codes")
-    requested_departements = set(df_codes["departement_id"].unique())
+    requested_municipalities = set(df_codes["municipality_id"].unique())
 
     df_siret = []
 
-    siret_file = "%s/%s" % (context.path("data.sirene.download_siret"), context.stage("data.sirene.download_siret"))
+    siret_file = "%s/%s" % (context.path("data.sirene.download.siret"), context.stage("data.sirene.download.siret"))
 
     COLUMNS_DTYPES = {
         "siren":"int32", 
@@ -36,8 +36,8 @@ def execute(context):
 
             f = df_chunk["codeCommuneEtablissement"].isna() # Just to get a mask
 
-            for departement in requested_departements:
-                f |= df_chunk["codeCommuneEtablissement"].str.startswith(departement)
+            for municipality in requested_municipalities:
+                f |= (df_chunk["codeCommuneEtablissement"].astype(str) == municipality)
 
             f &= ~df_chunk["codeCommuneEtablissement"].isna()
             df_chunk = df_chunk[f]

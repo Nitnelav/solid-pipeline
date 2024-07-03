@@ -8,12 +8,12 @@ Should we consider using location accuracy variable to optimize process?
 """
 def configure(context):
     context.stage("data.sirene.cleaned.selected")
-    context.stage("data.sirene.raw_geoloc")
+    context.stage("data.sirene.raw.geoloc")
 
 
 def execute(context):
     df_sirene = context.stage("data.sirene.cleaned.selected")
-    df_siret_geoloc = context.stage("data.sirene.raw_geoloc")
+    df_siret_geoloc = context.stage("data.sirene.raw.geoloc")
 
 
     # merging geographical SIREN file (containing only SIRET and location) with full SIREN file (all variables and processed)
