@@ -1,0 +1,27 @@
+
+# pipeline cache
+.cache
+cache
+
+# Python specific
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environments
+venv/
+env/
+env.bak/
+env1/
+env2/
+.env
+
+# IDE specific
+.idea/
+.vscode/
+
+# Compiled files
+*.pyc
+*.pyo
+*.pyd
