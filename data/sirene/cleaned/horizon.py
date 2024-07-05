@@ -1,15 +1,19 @@
+import geopandas as gpd
 import pandas as pd
 import pandera as pa
 import numpy as np
 import random
+
+from ..categories import APE_ST_CODES
 
 """
 Clean the SIRENE enterprise census.
 """
  
 def configure(context):
-    context.stage("data.sirene.raw.siren", ephemeral = True)
-    context.stage("data.sirene.raw.siret", ephemeral = True)
+    context.stage("data.sirene.raw.geoloc")
+    context.stage("data.sirene.raw.siren")
+    context.stage("data.sirene.raw.siret")
     context.stage("data.spatial.codes")
 
 def execute(context):
@@ -18,10 +22,13 @@ def execute(context):
     pa.DataFrameSchema({
         "siren": pa.Column("int32"), 
         "siret": pa.Column("int64"), 
-        "codeCommuneEtablissement": pa.Column("str"),
         "activitePrincipaleEtablissement": pa.Column("str", nullable=True), 
         "trancheEffectifsEtablissement": pa.Column("str", nullable=True),
-        "etatAdministratifEtablissement": pa.Column("str")
+        "etatAdministratifEtablissement": pa.Column("str"),
+        "codeCommuneEtablissement": pa.Column("str"),
+        "numeroVoieEtablissement": pa.Column("str", nullable=True),
+        "typeVoieEtablissement": pa.Column("str", nullable=True),
+        "libelleVoieEtablissement": pa.Column("str", nullable=True)
     }).validate(df_sirene_establishments)
 
     df_sirene_headquarters = context.stage("data.sirene.raw.siren")
@@ -29,6 +36,13 @@ def execute(context):
         "siren": pa.Column("int32"), 
         "categorieJuridiqueUniteLegale": pa.Column("str"), 
     }).validate(df_sirene_headquarters)
+
+    df_siret_geoloc = context.stage("data.sirene.raw.geoloc")
+    pa.DataFrameSchema({
+        "siret": pa.Column("int64"),
+        "x": pa.Column("float"),
+        "y": pa.Column("float")
+    }).validate(df_siret_geoloc)
 
     df_codes = context.stage("data.spatial.codes")
     pa.DataFrameSchema({
@@ -86,6 +100,14 @@ def execute(context):
     
     # Add activity classification
     df_sirene["ape"] = df_sirene["activitePrincipaleEtablissement"]
+    
+    # assign ST45 and ST8
+    df_sirene["st8"] = "0"
+    df_sirene["st45"] = "0"
+
+    for ape, st in APE_ST_CODES.items():
+        df_sirene.loc[df_sirene["ape"] == ape, "st8"] = str(st['ST8'])
+        df_sirene.loc[df_sirene["ape"] == ape, "st45"] = str(st['ST45'])
 
     # Check communes
     df_sirene["municipality_id"] = df_sirene["codeCommuneEtablissement"].astype("category")
@@ -123,7 +145,23 @@ def execute(context):
     df_sirene = df_sirene[
         df_sirene["law_status"].isin(unwanted_law_status) == False
     ]
-    
-    df_sirene = df_sirene[["siren", "municipality_id", "employees", "minimum_employees", "maximum_employees", "ape", "siret", "law_status"]]
 
+    # merging geographical SIREN file (containing only SIRET and location) with full SIREN file (all variables and processed)
+    df_sirene = df_sirene.join(df_siret_geoloc.set_index('siret'), on='siret', how="left")
+    df_sirene.dropna(subset=['x', 'y'],inplace=True)
+
+    # convert to geopandas dataframe with Lambert 93, EPSG:2154 french official projection
+    df_sirene = gpd.GeoDataFrame(df_sirene, geometry=gpd.points_from_xy(df_sirene.x, df_sirene.y),crs="EPSG:2154")
+
+    # Count the number of rows with the same geometry
+    df_sirene["geometry_count"] = df_sirene.groupby("geometry")["geometry"].transform("count")
+    
+    # Remove rows with count greater than 15
+    df_sirene = df_sirene[df_sirene["geometry_count"] <= 15]
+
+    # cleanup columns
+    df_sirene = df_sirene[[
+        "siren", "siret", "municipality_id", "employees", "ape", "law_status", 'st8', 'st45'
+    ]]
+    
     return df_sirene

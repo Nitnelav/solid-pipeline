@@ -16,14 +16,14 @@ def configure(context):
 def execute(context):
     df_cleaned = context.stage("cleaned")
     schema = pa.DataFrameSchema({
-        "siren": pa.Column("str"),
+        "siren": pa.Column("int32"),
+        "siret": pa.Column("int64"),
         "municipality_id": pa.Column("str"),
         "employees": pa.Column("int"),
-        "minimum_employees": pa.Column("int"),
-        "maximum_employees": pa.Column("int"),
         "ape": pa.Column("str"),
-        "siret": pa.Column("str"),
         "law_status": pa.Column("str"),
+        "st8": pa.Column("str"),
+        "st45": pa.Column("str"),
     })
 
     schema.validate(df_cleaned)

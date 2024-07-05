@@ -12,7 +12,7 @@ def configure(context):
 def execute(context):
     # Filter by department
     df_codes = context.stage("data.spatial.codes")
-    requested_departments = set(df_codes["department_id"].unique())
+    requested_municipalities = set(df_codes["municipality_id"].unique())
     
     COLUMNS_DTYPES = {
         "siret":"int64", 
@@ -22,7 +22,7 @@ def execute(context):
     }
 
     geoloc_file = "%s/%s" % (context.path("data.sirene.download.geoloc"), context.stage("data.sirene.download.geoloc"))
-    df_siret_geoloc = pd.DataFrame(columns=["siret","x","y"])
+    df_siret_geoloc = None
     
     with context.progress(label = "Reading geolocalized SIRET ...") as progress:
          csv = pd.read_csv(geoloc_file, 
@@ -33,11 +33,14 @@ def execute(context):
             
             f = df_chunk["siret"].isna() # Just to get a mask
             
-            for department in requested_departments:
+            for municipality in requested_municipalities:
 
-                f |= df_chunk["plg_code_commune"].str.startswith(department)
+                f |= df_chunk["plg_code_commune"].astype(str) == municipality
 
-            df_siret_geoloc = pd.concat([df_siret_geoloc, df_chunk[f]],ignore_index=True)
+            if df_siret_geoloc is None:
+                df_siret_geoloc = df_chunk[f]
+            else:
+                df_siret_geoloc = pd.concat([df_siret_geoloc, df_chunk[f]],ignore_index=True)
 
     return df_siret_geoloc
 

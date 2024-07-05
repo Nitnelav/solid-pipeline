@@ -21,10 +21,13 @@ def execute(context):
     COLUMNS_DTYPES = {
         "siren":"int32", 
         "siret":"int64", 
-        "codeCommuneEtablissement":"str",
         "activitePrincipaleEtablissement":"str", 
         "trancheEffectifsEtablissement":"str",
-        "etatAdministratifEtablissement":"str"
+        "etatAdministratifEtablissement":"str",
+        "codeCommuneEtablissement":"str",
+        "numeroVoieEtablissement":"str",
+        "typeVoieEtablissement":"str",
+        "libelleVoieEtablissement":"str",
     }
     
     with context.progress(label = "Reading SIRET...") as progress:

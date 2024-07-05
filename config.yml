@@ -8,6 +8,7 @@ run:
   # - data.sirene.localized
   # - data.sirene.cleaned.horizon
   - data.sirene.cleaned.compare
+  - data.sirene.output
 
 
 config:
@@ -18,3 +19,4 @@ config:
   municipalities: [44109]
 
   sirene_cleaning_method: "horizon"
+  sirene_output_csv_path: "D:/SOLID/solid-pipeline/sirane_cleaned_horizon.csv"
