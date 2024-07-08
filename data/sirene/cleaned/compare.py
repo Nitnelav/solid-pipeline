@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 
 def configure(context):
+    context.config("sirene_compare_method_output")
     context.stage("data.sirene.cleaned.eqasim")
     context.stage("data.sirene.cleaned.horizon")
     context.stage("data.sirene.cleaned.adrien")
@@ -17,13 +18,15 @@ def execute(context):
 
     schema = pa.DataFrameSchema({
         "siren": pa.Column("int32"),
-        "siret": pa.Column("int64"),
-        "municipality_id": pa.Column("str"),
-        "employees": pa.Column("int"),
-        "ape": pa.Column("str"),
-        "law_status": pa.Column("str"),
-        "st8": pa.Column("str"),
-        "st45": pa.Column("str"),
+        "siret": pa.Column(int),
+        "municipality_id": pa.Column(str),
+        "employees": pa.Column(int),
+        "ape": pa.Column(str),
+        "law_status": pa.Column(str),
+        "st8": pa.Column(int),
+        "st20": pa.Column(int),
+        "st45": pa.Column(str),
+        "geometry": pa.Column("geometry"),
     })
     schema.validate(df_cleaned_eqasim)
     schema.validate(df_cleaned_horizon)
@@ -48,7 +51,7 @@ def execute(context):
     df_employees = pd.concat([employees_eqasim,employees_horizon,employees_adrien], axis=1)
     print(df_employees)
 
-    # Plotting df_st8 data
+    # Plotting df_employees data
     df_employees.plot(kind='bar', stacked=False)
     plt.xlabel('employees')
     plt.ylabel('Count / Max')
@@ -56,7 +59,7 @@ def execute(context):
     plt.legend()
     plt.xticks(rotation=45)
     plt.tight_layout()
-    plt.savefig('./sirene_compare_employees.png')
+    plt.savefig('%s/sirene_compare_employees.png' % context.config("sirene_compare_method_output"))
 
     # Compute the distribution of the st8 column
     st8_eqasim = df_cleaned_eqasim['st8'].value_counts(normalize=True, sort=False)
@@ -79,7 +82,7 @@ def execute(context):
     plt.title('Distribution of st8 column')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('./sirene_compare_st8.png')
+    plt.savefig('%s/sirene_compare_st8.png' % context.config("sirene_compare_method_output"))
 
     # Compute the distribution of the st45 column
     st45_eqasim = df_cleaned_eqasim['st45'].value_counts(normalize=True, sort=False)
@@ -102,4 +105,27 @@ def execute(context):
     plt.title('Distribution of st45 column')
     plt.legend()
     plt.tight_layout()
-    plt.savefig('./sirene_compare_st45.png')
+    plt.savefig('%s/sirene_compare_st45.png' % context.config("sirene_compare_method_output"))
+
+    # Compute the distribution of the st20 column
+    st20_eqasim = df_cleaned_eqasim['st20'].value_counts(normalize=True, sort=False)
+    st20_eqasim.name = 'eqasim (nb: %d)' % len(df_cleaned_eqasim)
+
+    st20_horizon = df_cleaned_horizon['st20'].value_counts(normalize=True, sort=False)
+    st20_horizon.name = 'horizon (nb: %d)' % len(df_cleaned_horizon)
+
+    st20_adrien = df_cleaned_adrien['st20'].value_counts(normalize=True, sort=False)
+    st20_adrien.name = 'adrien (nb: %d)' % len(df_cleaned_adrien)
+
+    df_st20 = pd.concat([st20_eqasim, st20_horizon, st20_adrien], axis=1)
+    df_st20.sort_index(inplace=True)
+    print(df_st20)
+
+    # Plotting df_st20 data
+    df_st20.plot(kind='bar', stacked=False)
+    plt.xlabel('st20')
+    plt.ylabel('Count / Max')
+    plt.title('Distribution of st20 column')
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig('%s/sirene_compare_st20.png' % context.config("sirene_compare_method_output"))

@@ -6,6 +6,8 @@ import random
 
 from ..categories import APE_ST_CODES
 
+from .utils import get_st20
+
 """
 Clean the SIRENE enterprise census.
 """
@@ -102,11 +104,11 @@ def execute(context):
     df_sirene["ape"] = df_sirene["activitePrincipaleEtablissement"]
     
     # assign ST45 and ST8
-    df_sirene["st8"] = "0"
+    df_sirene["st8"] = 0
     df_sirene["st45"] = "0"
 
     for ape, st in APE_ST_CODES.items():
-        df_sirene.loc[df_sirene["ape"] == ape, "st8"] = str(st['ST8'])
+        df_sirene.loc[df_sirene["ape"] == ape, "st8"] = int(st['ST8'])
         df_sirene.loc[df_sirene["ape"] == ape, "st45"] = str(st['ST45'])
 
     # Check communes
@@ -159,9 +161,11 @@ def execute(context):
     # Remove rows with count greater than 15
     df_sirene = df_sirene[df_sirene["geometry_count"] <= 15]
 
+    df_sirene['st20'] = df_sirene.apply(lambda x: get_st20(x['st8'], x['employees']), axis=1)
+    
     # cleanup columns
     df_sirene = df_sirene[[
-        "siren", "siret", "municipality_id", "employees", "ape", "law_status", 'st8', 'st45'
+        "siren", "siret", "municipality_id", "employees", "ape", "law_status", 'st8', 'st20', 'st45', "geometry"
     ]]
-    
+
     return df_sirene

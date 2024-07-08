@@ -8,8 +8,9 @@ run:
   # - data.sirene.localized
   # - data.sirene.cleaned.horizon
   - data.sirene.cleaned.compare
+  - data.hubs.output
   - data.sirene.output
-
+  - movements.output
 
 config:
   processes : 8
@@ -19,4 +20,8 @@ config:
   municipalities: [44109]
 
   sirene_cleaning_method: "horizon"
-  sirene_output_csv_path: "D:/SOLID/solid-pipeline/sirane_cleaned_horizon.csv"
+
+  sirene_compare_method_output: "D:/SOLID/solid-pipeline/output/"
+  sirene_output_path: "D:/SOLID/solid-pipeline/output/sirene.geojson"
+  hubs_output_path: "D:/SOLID/solid-pipeline/output/hubs.geojson"
+  movements_output_path: "D:/SOLID/solid-pipeline/output/movements.geojson"

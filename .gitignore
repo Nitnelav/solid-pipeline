@@ -3,6 +3,8 @@
 .cache
 cache
 
+output
+
 # Python specific
 *.pyc
 *.pyo

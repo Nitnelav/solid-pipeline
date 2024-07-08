@@ -14,17 +14,17 @@ def configure(context):
         raise RuntimeError("Unknown Sirenen Cleaning Method: %s" % sirene_cleaning_method)
 
 def execute(context):
-    df_cleaned = context.stage("cleaned")
-    schema = pa.DataFrameSchema({
+    gdf_sirene = context.stage("cleaned")
+    pa.DataFrameSchema({
         "siren": pa.Column("int32"),
-        "siret": pa.Column("int64"),
-        "municipality_id": pa.Column("str"),
-        "employees": pa.Column("int"),
-        "ape": pa.Column("str"),
-        "law_status": pa.Column("str"),
-        "st8": pa.Column("str"),
-        "st45": pa.Column("str"),
-    })
-
-    schema.validate(df_cleaned)
-    return df_cleaned
+        "siret": pa.Column(int),
+        "municipality_id": pa.Column(str),
+        "employees": pa.Column(int),
+        "ape": pa.Column(str),
+        "law_status": pa.Column(str),
+        "st8": pa.Column(int),
+        "st20": pa.Column(int),
+        "st45": pa.Column(str),
+        "geometry": pa.Column("geometry"),
+    }).validate(gdf_sirene)
+    return gdf_sirene

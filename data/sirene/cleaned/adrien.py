@@ -5,6 +5,8 @@ import pandera as pa
 from ..categories import APE_ST_CODES
 from .employees import TEE_ST_EMPLOYEES
 
+from .utils import get_st20
+
 """
 Clean the SIRENE enterprise census.
 """
@@ -69,14 +71,15 @@ def execute(context):
     df_sirene["ape"] = df_sirene["activitePrincipaleEtablissement"]
 
     # assign ST45 and ST8
-    df_sirene["st8"] = "0"
+    df_sirene["st8"] = 0
     df_sirene["st45"] = "0"
 
     for ape, st in APE_ST_CODES.items():
-        df_sirene.loc[df_sirene["ape"] == ape, "st8"] = str(st['ST8'])
+        df_sirene.loc[df_sirene["ape"] == ape, "st8"] = int(st['ST8'])
         df_sirene.loc[df_sirene["ape"] == ape, "st45"] = str(st['ST45'])
 
-    df_sirene = df_sirene[df_sirene["st8"] != "0"]
+    # TODO : add a check to see if all APE codes are in the dictionary
+    df_sirene = df_sirene[df_sirene["st8"] != 0]
 
     # Check communes
     df_sirene["municipality_id"] = df_sirene["codeCommuneEtablissement"].astype("category")
@@ -95,7 +98,7 @@ def execute(context):
  
     for row in TEE_ST_EMPLOYEES:
         tee = str(row["TEE"]).zfill(2)
-        st8 = str(row["ST8"])
+        st8 = int(row["ST8"])
         employees = int(row["EMPLOYEES"])
         df_sirene.loc[
             (df_sirene["trancheEffectifsEtablissement"] == tee) &
@@ -153,8 +156,13 @@ def execute(context):
     # Count the number of rows with the same geometry
     df_sirene["geometry_count"] = df_sirene.groupby("geometry")["geometry"].transform("count")
     
+    # TODO : filter if more than 30 companies at the same location
+    df_sirene = df_sirene.groupby("geometry").apply(lambda x: x.nlargest(30, "employees")).reset_index(drop=True)
+
+    df_sirene['st20'] = df_sirene.apply(lambda x: get_st20(x['st8'], x['employees']), axis=1)
+
     # cleanup columns
     df_sirene = df_sirene[[
-        "siren", "siret", "municipality_id", "employees", "ape", "law_status", 'st8', 'st45'
+        "siren", "siret", "municipality_id", "employees", "ape", "law_status", 'st8', 'st20', 'st45', "geometry"
     ]]
     return df_sirene
