@@ -3,7 +3,10 @@
 .cache
 cache
 
+.output
 output
+
+experiments
 
 # Python specific
 *.pyc

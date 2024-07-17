@@ -6,14 +6,15 @@ channels:
 
 dependencies:
   - python=3.11
-  - geopandas=0.14.2
+  - geopandas=1.0.1
   - py7zr=0.20.5
   - pandera=0.20.1
   - pandera-io=0.20.1
   - pandera-geopandas=0.20.1
   - openpyxl=3.1.4
-  - pillow=9
+  # - pillow=9
   - pip
 
   - pip:
     - synpp==1.5.0
+    - pyvroom==1.14.0

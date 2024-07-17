@@ -57,9 +57,9 @@ def execute(context):
     df_sirene = df_sirene_establishments[df_sirene_establishments["siren"].isin(df_sirene_headquarters["siren"])].copy()
 
     # Remove inactive enterprises
-    # df_sirene = df_sirene[
-    #     df_sirene["etatAdministratifEtablissement"] == "A"
-    # ].copy()
+    df_sirene = df_sirene[
+        df_sirene["etatAdministratifEtablissement"] == "A"
+    ].copy()
 
     # Remove enterprises with 0 or invalid number of employees
     df_sirene = df_sirene[

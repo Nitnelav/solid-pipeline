@@ -48,7 +48,6 @@ ST45_ST8 = [
     { "st8": 8, "st45": "28-3", "label": "Entrepôts (dont transport)", "function": lambda e: 4.841 * e + 9.429 },
 ]
 
-
 ALL_DISTRIBUTIONS = {
     "route_type": { "direct": 0.25, "round": 0.75 },
 }
@@ -60,35 +59,35 @@ ALL_DISTRIBUTIONS = {
 
 ST8_DISTRIBUTIONS = {
     1: {
-        "move_type": { "both": .26, "collection": .34, "delivery": .40 },
+        "move_type": { "both": .26, "pickup": .34, "delivery": .40 },
         "move_mode": { "CPD": .43, "CPE": .18, "CA": .09 },
     },
     2: {
-        "move_type": { "both": .15, "collection": .22, "delivery": .63 },
+        "move_type": { "both": .15, "pickup": .22, "delivery": .63 },
         "move_mode": { "CPD": .25, "CPE": .28, "CA": .46 },
     },
     3: {
-        "move_type": { "both": .08, "collection": .42, "delivery": .50 },
+        "move_type": { "both": .08, "pickup": .42, "delivery": .50 },
         "move_mode": { "CPD": .08, "CPE": .34, "CA": .58 },
     },
     4: {
-        "move_type": { "both": .04, "collection": .63, "delivery": .33 },
+        "move_type": { "both": .04, "pickup": .63, "delivery": .33 },
         "move_mode": { "CPD": .18, "CPE": .27, "CA": .56 },
     },
     5: {
-        "move_type": { "both": .24, "collection": .17, "delivery": .60 },
+        "move_type": { "both": .24, "pickup": .17, "delivery": .60 },
         "move_mode": { "CPD": .11, "CPE": .15, "CA": .74 },
     },
     6: {
-        "move_type": { "both": .14, "collection": .13, "delivery": .73 },
+        "move_type": { "both": .14, "pickup": .13, "delivery": .73 },
         "move_mode": { "CPD": .19, "CPE": .45, "CA": .37 },
     },
     7: {
-        "move_type": { "both": .14, "collection": .28, "delivery": .58 },
+        "move_type": { "both": .14, "pickup": .28, "delivery": .58 },
         "move_mode": { "CPD": .07, "CPE": .37, "CA": .56 },
     },
     8: {
-        "move_type": { "both": .04, "collection": .59, "delivery": .27 },
+        "move_type": { "both": .04, "pickup": .59, "delivery": .27 },
         "move_mode": { "CPD": .11, "CPE": .27, "CA": .62 },
     },
 }
@@ -119,7 +118,6 @@ ST20_DISTRIBUTIONS = {
     19: { "vehicle": { "PL": .80, "VUL": .20 } },
     20: { "vehicle": { "PL": .87, "VUL": .13 } },
 }
-
 
 def get_st45_list(st8):
     return [
