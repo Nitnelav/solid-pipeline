@@ -7,10 +7,11 @@ run:
   # - data.sirene.raw.siren
   # - data.sirene.localized
   # - data.sirene.cleaned.horizon
-  - data.sirene.cleaned.compare
+  # - data.sirene.cleaned.compare
   # - data.hubs.output
   # - data.sirene.output
   # - movements.output
+  - data.ugms.raw
 
 config:
   processes : 8
@@ -25,3 +26,5 @@ config:
   sirene_output_path: "D:/SOLID/solid-pipeline/.output/sirene.geojson"
   hubs_output_path: "D:/SOLID/solid-pipeline/.output/hubs.geojson"
   movements_output_path: "D:/SOLID/solid-pipeline/.output/movements.geojson"
+  
+  ugms_file_path: "D:/SOLID/data-national/UGMS/Envoi_RIF_dec_2015_base_15_06_04.xlsx"

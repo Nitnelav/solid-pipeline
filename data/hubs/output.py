@@ -1,5 +1,5 @@
 import geopandas as gpd
-import pandera as pa
+
 
 def configure(context):
     context.config("hubs_output_path")
@@ -8,6 +8,6 @@ def configure(context):
 
 def execute(context):
     df_hubs: gpd.GeoDataFrame = context.stage("data.hubs.list")
-    
+
     df_hubs.to_file(context.config("hubs_output_path"), index=False)
     return df_hubs

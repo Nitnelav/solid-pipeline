@@ -1,6 +1,4 @@
 import geopandas as gpd
-import pandas as pd
-import pandera as pa
 
 def configure(context):
     context.config("sirene_output_path")

@@ -20,17 +20,19 @@ def configure(context):
 def execute(context):
 
     df_sirene_establishments = context.stage("data.sirene.raw.siret")
-    pa.DataFrameSchema({
-        "siren": pa.Column("int32"), 
-        "siret": pa.Column("int64"), 
-        "activitePrincipaleEtablissement": pa.Column("str", nullable=True), 
-        "trancheEffectifsEtablissement": pa.Column("str", nullable=True),
-        "etatAdministratifEtablissement": pa.Column("str"),
-        "codeCommuneEtablissement": pa.Column("str"),
-        "numeroVoieEtablissement": pa.Column("str", nullable=True),
-        "typeVoieEtablissement": pa.Column("str", nullable=True),
-        "libelleVoieEtablissement": pa.Column("str", nullable=True)
-    }).validate(df_sirene_establishments)
+    pa.DataFrameSchema(
+        {
+            "siren": pa.Column("int32"), 
+            "siret": pa.Column("int64"), 
+            "activitePrincipaleEtablissement": pa.Column("str", nullable=True), 
+            "trancheEffectifsEtablissement": pa.Column("str", nullable=True),
+            "etatAdministratifEtablissement": pa.Column("str"),
+            "codeCommuneEtablissement": pa.Column("str"),
+            "numeroVoieEtablissement": pa.Column("str", nullable=True),
+            "typeVoieEtablissement": pa.Column("str", nullable=True),
+            "libelleVoieEtablissement": pa.Column("str", nullable=True)
+        }
+    ).validate(df_sirene_establishments)
 
     df_sirene_headquarters = context.stage("data.sirene.raw.siren")
     pa.DataFrameSchema({

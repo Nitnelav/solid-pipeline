@@ -6,6 +6,7 @@ cache
 .output
 output
 
+.experiments
 experiments
 
 # Python specific

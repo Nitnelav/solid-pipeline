@@ -2,11 +2,12 @@ import geopandas as gpd
 
 from shapely.geometry import Point
 
+
 def configure(context):
     pass
 
-def execute(context):
 
+def execute(context):
     coordinates = [
         {"id": 0, "x": 356775.282160, "y": 6691067.446850},
         {"id": 1, "x": 353711.437570, "y": 6690454.858730},
