@@ -11,7 +11,8 @@ run:
   # - data.hubs.output
   # - data.sirene.output
   # - movements.output
-  - data.ugms.raw
+  # - data.ugms.raw
+  - data.ugms.distributions
 
 config:
   processes : 8

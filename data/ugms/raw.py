@@ -1,42 +1,44 @@
 import pandas as pd
+import numpy as np
 
 ESTABLISHEMENT_COLUMNS = {
-    "Idetab": "establishment_id",
-    "ST45-OK": "st45",
-    "ST8-OK": "st8",
-    "Apet_ok": "ape",
-    "Effec_total": "employees",
-    "MVTS-OK": "nb_movements",
-    "REC-OK": "nb_deliveries",
-    "EXP-OK": "nb_pickups",
-    "CONJ-OK": "nb_pickups_and_deliveries",
+    "Idetab": ("establishment_id", str),
+    "ST8-OK": ("st8", np.int8),
+    "ST45-OK": ("st45", str),
+    "Apet_ok": ("ape", str),
+    "Effec_total": ("employees", np.int32),
+    "MVTS-OK": ("nb_movements", np.float32),
+    "REC-OK": ("nb_deliveries", np.float32),
+    "EXP-OK": ("nb_pickups", np.float32),
+    "CONJ-OK": ("nb_pickups_and_deliveries", np.float32),
+    "COEF-REDRETAB": ("establishment_weight", np.float32),
 }
 
 GOODS_COLUMNS = {
-    "Idétab": "establishment_id",
-    "Type_operation": "move_type",
-    "Nature_marchandise": "good_type",
-    "Nature_marchandise_autre": "good_type_other",
-    "Conditionnement": "packaging",
-    "Nb_unités": "nb_units",
-    "Pds_kg": "weight_kg",
-    "Vol_m3": "volume_m3",
+    "Idétab": ("establishment_id", str),
+    "Type_operation": ("move_type", str),
+    "Nature_marchandise": ("good_type", str),
+    "Nature_marchandise_autre": ("good_type_other", str),
+    "Conditionnement": ("packaging", str),
+    "Nb_unités": ("nb_units", np.int32),
+    "Pds_kg": ("weight_kg", np.int32),
+    "Vol_m3": ("volume_m3", np.int32),
 }
 
 VEHICLES_COLUMNS = {
-    "Idetab": "establishment_id",
-    "Véhicules": "has_vehicles",
-    "Vélos_triport_total": "nb_bicycles",
-    "Motos_total": "nb_motorcycles",
-    "Voiture_total": "nb_cars",
-    "Fourgo_total": "nb_small_vans",
-    "Camio_total": "nb_big_vans",
-    "Port_7t5_total": "nb_trucks_7t5",
-    "Port_12t_total": "nb_trucks_12t",
-    "Port_19t_total": "nb_trucks_19t",
-    "Port_32t_total": "nb_trucks_32t",
-    "Art_28t_total": "nb_articuated_28t",
-    "Art_40t_total": "nb_articuated_40t",
+    "Idetab": ("establishment_id", str),
+    "Véhicules": ("has_vehicles", bool),
+    "Vélos_triport_total": ("nb_bicycles", np.int32),
+    "Motos_total": ("nb_motorcycles", np.int32),
+    "Voiture_total": ("nb_cars", np.int32),
+    "Fourgo_total": ("nb_vans_small", np.int32),
+    "Camio_total": ("nb_vans_big", np.int32),
+    "Port_7t5_total": ("nb_trucks_7t5", np.int32),
+    "Port_12t_total": ("nb_trucks_12t", np.int32),
+    "Port_19t_total": ("nb_trucks_19t", np.int32),
+    "Port_32t_total": ("nb_trucks_32t", np.int32),
+    "Art_28t_total": ("nb_articuated_28t", np.int32),
+    "Art_40t_total": ("nb_articuated_40t", np.int32),
 }
 
 
@@ -50,13 +52,31 @@ def execute(context):
     ugms_xls: dict[str, pd.DataFrame] = pd.read_excel(file_path, sheet_name=sheets)
     df_establishments, df_goods, df_vehicles = ugms_xls.values()
 
-    df_establishments.rename(columns=ESTABLISHEMENT_COLUMNS, inplace=True)
-    df_establishments = df_establishments[ESTABLISHEMENT_COLUMNS.values()]
+    column_names = {k: v[0] for k, v in ESTABLISHEMENT_COLUMNS.items()}
+    column_types = {v[0]: v[1]  for _, v in ESTABLISHEMENT_COLUMNS.items()}
 
-    df_goods.rename(columns=GOODS_COLUMNS, inplace=True)
-    df_goods = df_goods[GOODS_COLUMNS.values()]
+    df_establishments.rename(columns=column_names, inplace=True)
+    df_establishments = df_establishments[column_names.values()]
+    df_establishments["nb_deliveries"] = df_establishments["nb_deliveries"].fillna(0.0)
+    df_establishments["nb_pickups"] = df_establishments["nb_pickups"].fillna(0.0)
+    df_establishments["nb_pickups_and_deliveries"] = df_establishments["nb_pickups_and_deliveries"].fillna(0.0)
+    df_establishments = df_establishments.astype(column_types)
+    
+    column_names = {k: v[0] for k, v in GOODS_COLUMNS.items()}
+    column_types = {v[0]: v[1]  for _, v in GOODS_COLUMNS.items()}
 
-    df_vehicles.rename(columns=VEHICLES_COLUMNS, inplace=True)
-    df_vehicles = df_vehicles[VEHICLES_COLUMNS.values()]
+    df_goods.rename(columns=column_names, inplace=True)
+    df_goods = df_goods[column_names.values()]
+    df_goods["weight_kg"] = df_goods["weight_kg"].fillna(0)
+    df_goods["volume_m3"] = df_goods["volume_m3"].fillna(0)
+    df_goods = df_goods.astype(column_types)
+
+    column_names = {k: v[0] for k, v in VEHICLES_COLUMNS.items()}
+    column_types = {v[0]: v[1]  for _, v in VEHICLES_COLUMNS.items()}
+
+    df_vehicles.rename(columns=column_names, inplace=True)
+    df_vehicles = df_vehicles[column_names.values()]
+    df_vehicles["has_vehicles"] = df_vehicles["has_vehicles"].map({"oui": True, "non": False})
+    df_vehicles = df_vehicles.astype(column_types)
 
     return df_establishments, df_goods, df_vehicles
