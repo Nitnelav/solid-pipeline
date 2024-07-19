@@ -35,8 +35,8 @@ def execute(context):
             "good_type_other": pa.Column(str),
             "packaging": pa.Column(str),
             "nb_units": pa.Column(np.int32),
-            "weight_kg": pa.Column(np.int32),
-            "volume_m3": pa.Column(np.int32),
+            "weight_kg": pa.Column(np.float64),
+            "volume_m3": pa.Column(np.float64),
         }
     ).validate(df_goods)
 
@@ -83,24 +83,29 @@ def execute(context):
     df_goods["packaging"] = (
         df_goods["packaging"].replace("999999999", np.nan).astype("category")
     )
+    df_goods["nb_units"] = df_goods["nb_units"].replace(999999999, 0)
+    df_goods["weight_kg"] = df_goods["weight_kg"].replace(999999999, 0.0)
+    df_goods["volume_m3"] = df_goods["volume_m3"].replace(999999999, 0.0)
 
-    df_goods["nb_units"].replace(999999999, 0, inplace=True)
-    df_goods["weight_kg"].replace(999999999, 0, inplace=True)
-    df_goods["volume_m3"].replace(999999999, 0, inplace=True)
+    df_goods = df_goods[
+        (df_goods["nb_units"] > 0)
+        | (df_goods["weight_kg"] > 0)
+        | (df_goods["volume_m3"] > 0)
+    ]
 
     df_goods = df_goods.drop(columns=["good_type_other"])
 
-    df_vehicles = df_vehicles[df_vehicles["has_vehicles"]]
-    df_vehicles = df_vehicles.drop(columns=["has_vehicles"])
-
-    df_vehicles["nb_cars"].replace(999999999, 0, inplace=True)
-    df_vehicles["nb_vans_small"].replace(999999999, 0, inplace=True)
-    df_vehicles["nb_vans_big"].replace(999999999, 0, inplace=True)
-    df_vehicles["nb_trucks_7t5"].replace(999999999, 0, inplace=True)
-    df_vehicles["nb_trucks_12t"].replace(999999999, 0, inplace=True)
-    df_vehicles["nb_trucks_19t"].replace(999999999, 0, inplace=True)
-    df_vehicles["nb_trucks_32t"].replace(999999999, 0, inplace=True)
-    df_vehicles["nb_articuated_28t"].replace(999999999, 0, inplace=True)
-    df_vehicles["nb_articuated_40t"].replace(999999999, 0, inplace=True)
+    # do NOT remove establishments without vehicles, we want to keep them for the distribution
+    # df_vehicles = df_vehicles[df_vehicles["has_vehicles"]]
+    # df_vehicles = df_vehicles.drop(columns=["has_vehicles"])
+    df_vehicles["nb_cars"] = df_vehicles["nb_cars"].replace(999999999, 0)
+    df_vehicles["nb_vans_small"] = df_vehicles["nb_vans_small"].replace(999999999, 0)
+    df_vehicles["nb_vans_big"] = df_vehicles["nb_vans_big"].replace(999999999, 0)
+    df_vehicles["nb_trucks_7t5"] = df_vehicles["nb_trucks_7t5"].replace(999999999, 0)
+    df_vehicles["nb_trucks_12t"] = df_vehicles["nb_trucks_12t"].replace(999999999, 0)
+    df_vehicles["nb_trucks_19t"] = df_vehicles["nb_trucks_19t"].replace(999999999, 0)
+    df_vehicles["nb_trucks_32t"] = df_vehicles["nb_trucks_32t"].replace(999999999, 0)
+    df_vehicles["nb_articuated_28t"] = df_vehicles["nb_articuated_28t"].replace(999999999, 0)
+    df_vehicles["nb_articuated_40t"] = df_vehicles["nb_articuated_40t"].replace(999999999, 0)
 
     return df_establishments, df_goods, df_vehicles

@@ -21,8 +21,8 @@ GOODS_COLUMNS = {
     "Nature_marchandise_autre": ("good_type_other", str),
     "Conditionnement": ("packaging", str),
     "Nb_unités": ("nb_units", np.int32),
-    "Pds_kg": ("weight_kg", np.int32),
-    "Vol_m3": ("volume_m3", np.int32),
+    "Pds_kg": ("weight_kg", np.float64),
+    "Vol_m3": ("volume_m3", np.float64),
 }
 
 VEHICLES_COLUMNS = {

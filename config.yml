@@ -12,7 +12,9 @@ run:
   # - data.sirene.output
   # - movements.output
   # - data.ugms.raw
-  - data.ugms.distributions
+  # - data.ugms.goods_distributions
+  # - data.ugms.vehicles_distributions
+  - vehicles.all
 
 config:
   processes : 8
