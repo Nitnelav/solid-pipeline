@@ -28,7 +28,7 @@ def execute(context):
     ).validate(gdf_sirene)
 
     df_vehicles_more_than_0 = pa.DataFrameSchema(
-        index=pa.Index(pa.Int, name="st20"),
+        index=pa.Index(np.int8, name="st20"),
         columns = {
             "has_bicycles": pa.Column(np.float32),
             "has_motorcycles": pa.Column(np.float32),
@@ -45,8 +45,13 @@ def execute(context):
     ).validate(df_vehicles_more_than_0)
 
     df_vehicles_gaussian = pa.DataFrameSchema(
-        index=pa.Index(pa.Int, name="st20"),
+        index=pa.MultiIndex([
+            pa.Index(np.int8, name="st20"),
+            pa.Index(str),
+        ]),
         columns = {
+            "mean": pa.Column(np.float64),
+            "std": pa.Column(np.float64),
         }
     ).validate(df_vehicles_gaussian)
     

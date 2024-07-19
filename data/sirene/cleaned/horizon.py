@@ -157,7 +157,7 @@ def execute(context):
         9150, 9210, 9220, 9221, 9222, 9223, 9224, 9230, 9240, 9260, 9300
     ]))
 
-    df_sirene = df_sirene[df_sirene["law_status"].isin(unwanted_law_status) is False]
+    df_sirene = df_sirene[~df_sirene["law_status"].isin(unwanted_law_status)]
 
     # merging geographical SIREN file (containing only SIRET and location) with full SIREN file (all variables and processed)
     df_sirene = df_sirene.join(
