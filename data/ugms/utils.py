@@ -1,0 +1,17 @@
+GOODS_SHORT_NAME_MAP = {
+    'animaux vivants': 'ANIM',
+    'consignes': 'DEPO',
+    'emballages, déchets': 'GARB',
+    'minéraux': 'MINE',
+    'produits agricoles non alimentaires': 'AGRI',
+    'produits alimentaires semi-périssables': 'FOOD',
+    'produits chimiques dangereux': 'CHEMD',
+    'produits chimiques non dangereux': 'CHEM',
+    'produits congelés': 'FROZEN',
+    'produits frais': 'COLD',
+    'produits manufacturés fragiles': 'MANUF',
+    'produits manufacturés non fragiles': 'MANU',
+    'produits pétroliers': 'PETROL',
+    'pâte à papier et cellulose': 'PAPER',
+    'autre': 'OTHER',
+}

@@ -42,16 +42,16 @@ def execute(context):
     df_establishments = pa.DataFrameSchema(
         {
             "establishment_id": pa.Column(str),
-            "st8": pa.Column(np.int8),
-            "st20": pa.Column(np.int8),
+            "st8": pa.Column(int),
+            "st20": pa.Column(int),
             "st45": pa.Column("category"),
             "ape": pa.Column("category"),
-            "employees": pa.Column(np.int32),
-            "nb_movements": pa.Column(np.float32),
-            "nb_deliveries": pa.Column(np.float32),
-            "nb_pickups": pa.Column(np.float32),
-            "nb_pickups_and_deliveries": pa.Column(np.float32),
-            "establishment_weight": pa.Column(np.float32),
+            "employees": pa.Column(int),
+            "nb_movements": pa.Column(float),
+            "nb_deliveries": pa.Column(float),
+            "nb_pickups": pa.Column(float),
+            "nb_pickups_and_deliveries": pa.Column(float),
+            "establishment_weight": pa.Column(float),
         }
     ).validate(df_establishments)
 
@@ -59,17 +59,17 @@ def execute(context):
         {
             "establishment_id": pa.Column(str),
             "has_vehicles": pa.Column(bool),
-            "nb_bicycles": pa.Column(np.int32),
-            "nb_motorcycles": pa.Column(np.int32),
-            "nb_cars": pa.Column(np.int32),
-            "nb_vans_small": pa.Column(np.int32),
-            "nb_vans_big": pa.Column(np.int32),
-            "nb_trucks_7t5": pa.Column(np.int32),
-            "nb_trucks_12t": pa.Column(np.int32),
-            "nb_trucks_19t": pa.Column(np.int32),
-            "nb_trucks_32t": pa.Column(np.int32),
-            "nb_articuated_28t": pa.Column(np.int32),
-            "nb_articuated_40t": pa.Column(np.int32),
+            "nb_bicycles": pa.Column(int),
+            "nb_motorcycles": pa.Column(int),
+            "nb_cars": pa.Column(int),
+            "nb_vans_small": pa.Column(int),
+            "nb_vans_big": pa.Column(int),
+            "nb_trucks_7t5": pa.Column(int),
+            "nb_trucks_12t": pa.Column(int),
+            "nb_trucks_19t": pa.Column(int),
+            "nb_trucks_32t": pa.Column(int),
+            "nb_articuated_28t": pa.Column(int),
+            "nb_articuated_40t": pa.Column(int),
         }
     ).validate(df_vehicles)
 

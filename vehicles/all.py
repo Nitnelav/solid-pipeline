@@ -1,20 +1,36 @@
+import pandas as pd
 import pandera as pa
-import numpy as np
+
 
 def configure(context):
-    context.stage("data.sirene.assign_hub")
-    context.stage("data.ugms.vehicles_distributions")
+    context.stage("vehicles.quantity")
+
+
+def _generate_vehicles(context, siret):
+    vehicles = []
+    types = [col.replace("nb_", "") for col in siret.keys() if col.startswith("nb_")]
+
+    for type in types:
+        for _ in range(int(siret["nb_" + type])):
+            vehicles.append(
+                {
+                    "siret": siret["siret"],
+                    "type": type,
+                    "start": siret["geometry"],
+                }
+            )
+    context.progress.update()
+    return vehicles
+
 
 def execute(context):
-
-    gdf_sirene = context.stage("data.sirene.assign_hub")
-    df_vehicles_more_than_0, df_vehicles_gaussian = context.stage("data.ugms.vehicles_distributions")
+    gdf_sirene = context.stage("vehicles.quantity")
 
     gdf_sirene = pa.DataFrameSchema(
         {
             "siren": pa.Column("int32"),
             "siret": pa.Column(int),
-            "municipality_id": pa.Column(str),
+            "municipality_id": pa.Column("category"),
             "employees": pa.Column(int),
             "ape": pa.Column(str),
             "law_status": pa.Column(str),
@@ -27,32 +43,14 @@ def execute(context):
         }
     ).validate(gdf_sirene)
 
-    df_vehicles_more_than_0 = pa.DataFrameSchema(
-        index=pa.Index(np.int8, name="st20"),
-        columns = {
-            "has_bicycles": pa.Column(np.float32),
-            "has_motorcycles": pa.Column(np.float32),
-            "has_cars": pa.Column(np.float32),
-            "has_vans_small": pa.Column(np.float32),
-            "has_vans_big": pa.Column(np.float32),
-            "has_trucks_7t5": pa.Column(np.float32),
-            "has_trucks_12t": pa.Column(np.float32),
-            "has_trucks_19t": pa.Column(np.float32),
-            "has_trucks_32t": pa.Column(np.float32),
-            "has_articuated_28t": pa.Column(np.float32),
-            "has_articuated_40t": pa.Column(np.float32),
-        }
-    ).validate(df_vehicles_more_than_0)
+    vehicles = []
+    with context.progress(label="Generating Vehicles ...", total=len(gdf_sirene)):
+        with context.parallel() as parallel:
+            for new_vehicles in parallel.imap(
+                _generate_vehicles, gdf_sirene.to_dict(orient="records")
+            ):
+                vehicles += new_vehicles
 
-    df_vehicles_gaussian = pa.DataFrameSchema(
-        index=pa.MultiIndex([
-            pa.Index(np.int8, name="st20"),
-            pa.Index(str),
-        ]),
-        columns = {
-            "mean": pa.Column(np.float64),
-            "std": pa.Column(np.float64),
-        }
-    ).validate(df_vehicles_gaussian)
-    
-    return
+    df_vehicles = pd.DataFrame(vehicles)
+
+    return df_vehicles

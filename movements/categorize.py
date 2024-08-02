@@ -68,7 +68,12 @@ def execute(context):
             lambda x: _caracterize(x, rand), axis=1, result_type="expand"
         )
     )
+    gdf_movements["route_type"] = gdf_movements["route_type"].astype("category")
+    gdf_movements["move_type"] = gdf_movements["move_type"].astype("category")
+    gdf_movements["move_mode"] = gdf_movements["move_mode"].astype("category")
+    gdf_movements["vehicle"] = gdf_movements["vehicle"].astype("category")
 
     gdf_movements["distance"] = gdf_movements.apply(_get_distance, axis=1)
-
+    gdf_movements["distance"] = gdf_movements["distance"].astype(float)
+    
     return gdf_movements

@@ -12,16 +12,19 @@ run:
   # - data.sirene.output
   # - movements.output
   # - data.ugms.raw
+  # - data.ugms.cleaned
   # - data.ugms.goods_distributions
   # - data.ugms.vehicles_distributions
-  - vehicles.all
+  # - vehicles.all
+  # - goods.assign
+  - matching.matched
 
 config:
   processes : 8
 
   regions: []
-  departments: [75]
-  municipalities: []
+  departments: [44]
+  municipalities: [44109]
 
   sirene_cleaning_method: "horizon"
 

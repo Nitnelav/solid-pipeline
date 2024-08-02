@@ -23,6 +23,7 @@ def execute(context):
             "siren": pa.Column("int32"),
             "siret": pa.Column(int),
             "municipality_id": pa.Column(str),
+            "suburb_type": pa.Column("category"),
             "employees": pa.Column(int),
             "ape": pa.Column(str),
             "law_status": pa.Column(str),

@@ -184,12 +184,18 @@ def execute(context):
         lambda x: get_st20(x["st8"], x["employees"]), axis=1
     )
 
+    # assign suburb type
+    df_sirene["suburb_type"] = df_sirene["municipality_id"].apply(
+        lambda x: "C1" if x.startswith("75") else ("C2" if x.startswith(("92", "93", "94")) else "C3")
+    ).astype("category")
+
     # cleanup columns
     df_sirene = df_sirene[
         [
             "siren",
             "siret",
             "municipality_id",
+            "suburb_type",
             "employees",
             "ape",
             "law_status",
