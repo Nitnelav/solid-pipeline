@@ -4,7 +4,7 @@ from .utils import get_st45_list
 
 
 def configure(context):
-    context.stage("data.sirene.assign_hub")
+    context.stage("synthesis.sirene.sampled")
 
 
 def _get_movements(sirene_row):
@@ -19,7 +19,7 @@ def _get_movements(sirene_row):
 
 
 def execute(context):
-    gdf_sirene = context.stage("data.sirene.assign_hub")
+    gdf_sirene = context.stage("synthesis.sirene.sampled")
     pa.DataFrameSchema(
         {
             "siren": pa.Column("int32"),

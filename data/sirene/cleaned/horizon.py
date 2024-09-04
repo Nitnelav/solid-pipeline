@@ -69,7 +69,7 @@ def execute(context):
     # Remove enterprises with 0 or invalid number of employees
     df_sirene = df_sirene[
         ~df_sirene["trancheEffectifsEtablissement"].isna()
-        & ~df_sirene["trancheEffectifsEtablissement"].isin(["NN", "00"])
+        & ~df_sirene["trancheEffectifsEtablissement"].isin(["NN", "00", "None"])
     ]
 
     # Set the number of employees

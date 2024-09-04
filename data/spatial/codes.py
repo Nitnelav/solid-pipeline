@@ -11,7 +11,7 @@ def configure(context):
     context.stage("data.spatial.download.codes")
 
     context.config("regions", [])
-    context.config("departments", [44])
+    context.config("departments", [])
     context.config("municipalities", [])
 
 

@@ -4,7 +4,7 @@ import numpy as np
 
 
 def configure(context):
-    context.stage("data.sirene.assign_hub")
+    context.stage("synthesis.sirene.sampled")
     context.stage("data.ugms.goods_distributions")
 
 def _assign_goods(context, sirene):
@@ -20,16 +20,16 @@ def _assign_goods(context, sirene):
 
     goods = []
     rows = df_st8.sample(n=nb_goods_lines, weights=df_st8["weight_coeff"])
-    for row in rows:
+    for row in rows.to_dict(orient="records"):
         good = {   
             "siret": siret_id,
             "st8": st8,
-            "move_type": row["move_type"].values[0],
-            "good_type": row["good_type"].values[0],
-            "move_mode": row["move_mode"].values[0],
+            "move_type": row["move_type"],
+            "good_type": row["good_type"],
+            "move_mode": row["move_mode"],
         }
-        mean = row["mean"].values[0]
-        std = row["std"].values[0]
+        mean = row["mean"]
+        std = row["std"]
         good["weight_kg"] = abs(np.random.normal(mean, std))
 
         goods.append(good)
@@ -49,7 +49,7 @@ def _assign_nb_lines(context, sirene):
     return nb_lines
 
 def execute(context):
-    gdf_sirene = context.stage("data.sirene.assign_hub")
+    gdf_sirene = context.stage("synthesis.sirene.sampled")
     df_establishment_line_count, df_good_weight_distributions = context.stage(
         "data.ugms.goods_distributions"
     )
@@ -65,8 +65,8 @@ def execute(context):
             "st8": pa.Column(int),
             "st20": pa.Column(int),
             "st45": pa.Column(str),
-            "hub_id": pa.Column(int),
-            "hub_distance": pa.Column(float),
+            # "hub_id": pa.Column(int),
+            # "hub_distance": pa.Column(float),
             "geometry": pa.Column("geometry"),
         }
     ).validate(gdf_sirene)
@@ -122,4 +122,8 @@ def execute(context):
                 sirene_goods += goods
 
     df_sirene_goods = pd.DataFrame(sirene_goods)
+    
+    if True:
+        df_sirene_goods.groupby(["good_type", "move_mode", "move_type"])["weight_kg"].describe().reset_index().to_csv("sirene_sampled_goods_IdF_2pct.csv", sep=";")
+
     return gdf_sirene, df_sirene_goods

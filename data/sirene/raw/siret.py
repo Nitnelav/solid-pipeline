@@ -33,27 +33,31 @@ def execute(context):
         "typeVoieEtablissement": "str",
         "libelleVoieEtablissement": "str",
     }
+    
+    df_siret = pd.read_csv(
+        siret_file,
+        usecols=COLUMNS_DTYPES.keys(),
+        dtype=COLUMNS_DTYPES,
+        na_filter=False,
+        engine="pyarrow",
+    )
+    df_siret.dropna(subset=["codeCommuneEtablissement"], inplace=True)
+    df_siret = df_siret[df_siret["codeCommuneEtablissement"].isin(requested_municipalities)]
 
-    with context.progress(label="Reading SIRET...") as progress:
-        csv = pd.read_csv(
-            siret_file,
-            usecols=COLUMNS_DTYPES.keys(),
-            dtype=COLUMNS_DTYPES,
-            chunksize=10240,
-        )
+    # with context.progress(label="Reading SIRET...") as progress:
 
-        for df_chunk in csv:
-            progress.update(len(df_chunk))
+    #     for df_chunk in csv:
+    #         progress.update(len(df_chunk))
 
-            f = df_chunk["codeCommuneEtablissement"].isna()  # Just to get a mask
+    #         f = df_chunk["codeCommuneEtablissement"].isna()  # Just to get a mask
 
-            for municipality in requested_municipalities:
-                f |= df_chunk["codeCommuneEtablissement"].astype(str) == municipality
+    #         for municipality in requested_municipalities:
+    #             f |= df_chunk["codeCommuneEtablissement"].astype(str) == municipality
 
-            f &= ~df_chunk["codeCommuneEtablissement"].isna()
-            df_chunk = df_chunk[f]
+    #         f &= ~df_chunk["codeCommuneEtablissement"].isna()
+    #         df_chunk = df_chunk[f]
 
-            if len(df_chunk) > 0:
-                df_siret.append(df_chunk)
+    #         if len(df_chunk) > 0:
+    #             df_siret.append(df_chunk)
 
-    return pd.concat(df_siret)
+    return df_siret

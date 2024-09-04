@@ -16,15 +16,17 @@ run:
   # - data.ugms.goods_distributions
   # - data.ugms.vehicles_distributions
   # - vehicles.all
-  # - goods.assign
-  - matching.matched
+  - goods.assign
+  - synthesis.matched
 
 config:
-  processes : 8
+  processes : 16
+
+  sirene_sample_size: 1.00
 
   regions: []
-  departments: [44]
-  municipalities: [44109]
+  departments: [75, 91, 92, 93, 94, 95]
+  municipalities: []
 
   sirene_cleaning_method: "horizon"
 

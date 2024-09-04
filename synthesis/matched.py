@@ -6,7 +6,7 @@ import itertools
 
 
 def configure(context):
-    context.stage("data.sirene.assign_hub")
+    context.stage("synthesis.sirene.sampled")
     context.stage("data.ugms.cleaned")
 
     context.config("random_seed", 1234)
@@ -156,7 +156,7 @@ def _create_goods(context, matching):
     return df_goods.to_dict(orient="records")
 
 def execute(context):
-    gdf_sirene = context.stage("data.sirene.assign_hub")
+    gdf_sirene = context.stage("synthesis.sirene.sampled")
     df_establishments, df_goods, df_vehicles = context.stage("data.ugms.cleaned")
 
     gdf_sirene = pa.DataFrameSchema(
@@ -171,8 +171,6 @@ def execute(context):
             "st8": pa.Column(int),
             "st20": pa.Column(int),
             "st45": pa.Column(str),
-            "hub_id": pa.Column(int),
-            "hub_distance": pa.Column(float),
             "geometry": pa.Column("geometry"),
         }
     ).validate(gdf_sirene)
@@ -254,5 +252,9 @@ def execute(context):
                 sirene_goods += goods
 
     df_sirene_goods = pd.DataFrame(sirene_goods)
+  
+    if True:
+        df_goods.groupby(["good_type", "move_mode", "move_type"])["operation_weight"].sum().reset_index().to_csv("ugms_goods_IdF.csv", sep=";")
+        df_sirene_goods.groupby(["good_type", "move_mode", "move_type"])["weight_kg"].describe().reset_index().to_csv("sirene_matched_goods_IdF_2pct.csv", sep=";")
 
     return df_sirene_goods

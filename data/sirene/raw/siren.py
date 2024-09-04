@@ -24,20 +24,14 @@ def execute(context):
         "categorieJuridiqueUniteLegale": "str",
     }
 
-    with context.progress(label="Reading SIREN...") as progress:
-        csv = pd.read_csv(
-            siren_file,
-            usecols=COLUMNS_DTYPES.keys(),
-            dtype=COLUMNS_DTYPES,
-            chunksize=10240,
-        )
 
-        for df_chunk in csv:
-            progress.update(len(df_chunk))
+    df_siren = pd.read_csv(
+        siren_file,
+        usecols=COLUMNS_DTYPES.keys(),
+        dtype=COLUMNS_DTYPES,
+        na_filter=False,
+        engine="pyarrow",
+    )
+    df_siren = df_siren[df_siren["siren"].isin(relevant_siren)]
 
-            df_chunk = df_chunk[df_chunk["siren"].isin(relevant_siren)]
-
-            if len(df_chunk) > 0:
-                df_siren.append(df_chunk)
-
-    return pd.concat(df_siren)
+    return df_siren

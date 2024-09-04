@@ -4,7 +4,7 @@ import numpy as np
 
 
 def configure(context):
-    context.stage("data.sirene.assign_hub")
+    context.stage("synthesis.sirene.sampled")
     context.stage("data.ugms.vehicles_distributions")
 
 
@@ -32,7 +32,7 @@ def _assign_nb_vehicles(context, siret):
 
 
 def execute(context):
-    gdf_sirene = context.stage("data.sirene.assign_hub")
+    gdf_sirene = context.stage("synthesis.sirene.sampled")
     df_vehicles_more_than_0, df_vehicles_gaussian = context.stage(
         "data.ugms.vehicles_distributions"
     )
