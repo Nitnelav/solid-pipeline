@@ -36,17 +36,17 @@ def _get_gaussian(group):
 
 
 def execute(context):
-    df_establishments, _, df_vehicles = context.stage("data.ugms.cleaned")
+    df_establishments, _, df_vehicles, _ = context.stage("data.ugms.cleaned")
 
     # Validate the data
     df_establishments = pa.DataFrameSchema(
         {
             "establishment_id": pa.Column(str),
-            "st8": pa.Column(int),
-            "st20": pa.Column(int),
+            "st8": pa.Column(pa.Int32),
+            "st20": pa.Column(pa.Int32),
             "st45": pa.Column("category"),
             "ape": pa.Column("category"),
-            "employees": pa.Column(int),
+            "employees": pa.Column(pa.Int32),
             "nb_movements": pa.Column(float),
             "nb_deliveries": pa.Column(float),
             "nb_pickups": pa.Column(float),
@@ -59,17 +59,17 @@ def execute(context):
         {
             "establishment_id": pa.Column(str),
             "has_vehicles": pa.Column(bool),
-            "nb_bicycles": pa.Column(int),
-            "nb_motorcycles": pa.Column(int),
-            "nb_cars": pa.Column(int),
-            "nb_vans_small": pa.Column(int),
-            "nb_vans_big": pa.Column(int),
-            "nb_trucks_7t5": pa.Column(int),
-            "nb_trucks_12t": pa.Column(int),
-            "nb_trucks_19t": pa.Column(int),
-            "nb_trucks_32t": pa.Column(int),
-            "nb_articuated_28t": pa.Column(int),
-            "nb_articuated_40t": pa.Column(int),
+            "nb_bicycles": pa.Column(pa.Int32),
+            "nb_motorcycles": pa.Column(pa.Int32),
+            "nb_cars": pa.Column(pa.Int32),
+            "nb_vans_small": pa.Column(pa.Int32),
+            "nb_vans_big": pa.Column(pa.Int32),
+            "nb_trucks_7t5": pa.Column(pa.Int32),
+            "nb_trucks_12t": pa.Column(pa.Int32),
+            "nb_trucks_19t": pa.Column(pa.Int32),
+            "nb_trucks_32t": pa.Column(pa.Int32),
+            "nb_articuated_28t": pa.Column(pa.Int32),
+            "nb_articuated_40t": pa.Column(pa.Int32),
         }
     ).validate(df_vehicles)
 

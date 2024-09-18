@@ -37,8 +37,6 @@ def execute(context):
             "st8": pa.Column(int),
             "st20": pa.Column(int),
             "st45": pa.Column(str),
-            "hub_id": pa.Column(int),
-            "hub_distance": pa.Column(float),
             "geometry": pa.Column("geometry"),
         }
     ).validate(gdf_sirene)

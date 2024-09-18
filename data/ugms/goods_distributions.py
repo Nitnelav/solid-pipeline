@@ -8,7 +8,7 @@ def configure(context):
 
 
 def execute(context):
-    df_establishments, df_goods, _ = context.stage("data.ugms.cleaned")
+    df_establishments, df_goods, *_ = context.stage("data.ugms.cleaned")
 
     # Validate the data
     df_establishments = pa.DataFrameSchema(
@@ -59,7 +59,7 @@ def execute(context):
         std = np.sqrt(
             (group["operation_weight"] * (group["weight_kg"] - mean) ** 2).sum() / weight_sum
         )
-        std = std if not np.isnan(std) else 0.0
+        std = std if not np.isnan(std) else 0.0 
 
         return pd.Series({"mean": mean, "std": std, "weight_coeff": weight_sum})
 

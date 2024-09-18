@@ -252,9 +252,5 @@ def execute(context):
                 sirene_goods += goods
 
     df_sirene_goods = pd.DataFrame(sirene_goods)
-  
-    if True:
-        df_goods.groupby(["good_type", "move_mode", "move_type"])["operation_weight"].sum().reset_index().to_csv("ugms_goods_IdF.csv", sep=";")
-        df_sirene_goods.groupby(["good_type", "move_mode", "move_type"])["weight_kg"].describe().reset_index().to_csv("sirene_matched_goods_IdF_2pct.csv", sep=";")
-
+    
     return df_sirene_goods

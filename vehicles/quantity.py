@@ -48,14 +48,12 @@ def execute(context):
             "st8": pa.Column(int),
             "st20": pa.Column(int),
             "st45": pa.Column(str),
-            "hub_id": pa.Column(int),
-            "hub_distance": pa.Column(float),
             "geometry": pa.Column("geometry"),
         }
     ).validate(gdf_sirene)
 
     df_vehicles_more_than_0 = pa.DataFrameSchema(
-        index=pa.Index(int, name="st20"),
+        index=pa.Index(pa.Int32, name="st20"),
         columns={
             "has_bicycles": pa.Column(float),
             "has_motorcycles": pa.Column(float),
@@ -74,7 +72,7 @@ def execute(context):
     df_vehicles_gaussian = pa.DataFrameSchema(
         index=pa.MultiIndex(
             [
-                pa.Index(int, name="st20"),
+                pa.Index(pa.Int32, name="st20"),
                 pa.Index(str),
             ]
         ),

@@ -1,4 +1,5 @@
 import pandera as pa
+import pandas as pd
 import numpy as np
 
 from ..sirene.cleaned.utils import get_st20
@@ -43,7 +44,7 @@ def _get_goods_weight_kg(group):
 
 
 def execute(context):
-    df_establishments, df_operations, df_goods, df_vehicles = context.stage(
+    df_establishments, df_operations, df_goods, df_vehicles, df_relations = context.stage(
         "data.ugms.raw"
     )
 
@@ -59,6 +60,7 @@ def execute(context):
             "nb_deliveries": pa.Column(float),
             "nb_pickups": pa.Column(float),
             "nb_pickups_and_deliveries": pa.Column(float),
+            "surface": pa.Column(float),
             "suburb_type": pa.Column("category"),
             "establishment_weight": pa.Column(float),
         }
@@ -110,6 +112,42 @@ def execute(context):
             "nb_articuated_40t": pa.Column(np.int32),
         }
     ).validate(df_vehicles)
+
+    df_relations = pa.DataFrameSchema(
+        {
+            "establishment_id": pa.Column(str),
+            "receive_center_nb": pa.Column(np.int32),
+            "receive_center_part": pa.Column(float),
+            "receive_center_part_cost": pa.Column(float),
+            "receive_wholesaler_nb": pa.Column(np.int32),
+            "receive_wholesaler_part": pa.Column(float),
+            "receive_wholesaler_part_cost": pa.Column(float),
+            "receive_supplier_nb": pa.Column(np.int32),
+            "receive_supplier_part": pa.Column(float),
+            "receive_supplier_part_cost": pa.Column(float),
+            "receive_client_nb": pa.Column(np.int32),
+            "receive_client_part": pa.Column(float),
+            "receive_client_part_cost": pa.Column(float),
+            "receive_other_nb": pa.Column(np.int32),
+            "receive_other_part": pa.Column(float),
+            "receive_other_part_cost": pa.Column(float),
+            "send_center_nb": pa.Column(np.int32),
+            "send_center_part": pa.Column(float),
+            "send_center_part_cost": pa.Column(float),
+            "send_wholesaler_nb": pa.Column(np.int32),
+            "send_wholesaler_part": pa.Column(float),
+            "send_wholesaler_part_cost": pa.Column(float),
+            "send_supplier_nb": pa.Column(np.int32),
+            "send_supplier_part": pa.Column(float),
+            "send_supplier_part_cost": pa.Column(float),
+            "send_client_nb": pa.Column(np.int32),
+            "send_client_part": pa.Column(float),
+            "send_client_part_cost": pa.Column(float),
+            "send_other_nb": pa.Column(np.int32),
+            "send_other_part": pa.Column(float),
+            "send_other_part_cost": pa.Column(float),
+        }
+    ).validate(df_relations)
 
     df_establishments["st20"] = df_establishments.apply(
         lambda x: get_st20(x["st8"], x["employees"]), axis=1
@@ -194,6 +232,8 @@ def execute(context):
         on="operation_id",
     )
 
+    df_goods = df_goods.loc[df_goods["operation_weight"] > 0]
+
     df_goods.loc[:, "kg_per_unit"] = 0.0
     mask = (df_goods["nb_units"] > 0) & (df_goods["weight_kg"] > 0)
     df_goods.loc[mask, "kg_per_unit"] = (
@@ -257,4 +297,69 @@ def execute(context):
         999999999, 0
     )
 
-    return df_establishments, df_goods, df_vehicles
+    relation_directions = ["receive", "send"]
+    relation_types = ["center", "wholesaler", "supplier", "client", "other"]
+
+    df_relations.loc[df_relations["send_other_part"] == 190, "send_other_part"] = 100.0
+    df_relations.loc[df_relations["send_other_part_cost"] == 190, "send_other_part_cost"] = 100.0
+
+    for direction in relation_directions:
+        for type in relation_types:
+            column_base = "%s_%s" % (direction, type)
+            
+            # nb is 999999999 but eihter part or part_cost is valid
+            mask = (df_relations[column_base + "_nb"] == 999999999)
+            mask &= (
+                df_relations[column_base + "_part"].between(0, 100, inclusive="right") | 
+                df_relations[column_base + "_part_cost"].between(0, 100, inclusive="right")
+            )
+            df_relations.loc[mask, column_base + "_nb"] = 1
+            
+            # nb is 999999999 but eihter part or part_cost is 0
+            mask = (df_relations[column_base + "_nb"] == 999999999)
+            mask &= ((df_relations[column_base + "_part"] == 0.0) | (df_relations[column_base + "_part"] > 999))
+            mask &= ((df_relations[column_base + "_part_cost"] == 0.0) | (df_relations[column_base + "_part_cost"] > 999))
+            df_relations.loc[mask, column_base + "_nb"] = 0
+
+            # nb is > 0 but part is 999999999 but part_cost is valid
+            mask = (df_relations[column_base + "_nb"] > 0)
+            mask &= (df_relations[column_base + "_part"] > 100)
+            mask &= (df_relations[column_base + "_part_cost"].between(0, 100, inclusive="right"))
+            df_relations.loc[mask, column_base + "_part"] = df_relations.loc[mask, column_base + "_part_cost"]
+
+            # part and part_cost is 999999999
+            mask = (df_relations[column_base + "_nb"] > 0)
+            mask &= (df_relations[column_base + "_part"] > 100)
+            mask &= (df_relations[column_base + "_part_cost"] > 100)
+            df_relations.loc[mask, column_base + "_part"] = 100
+
+            df_relations.drop(columns=[column_base + "_part_cost"])
+
+    # rearrange relations
+    relations = []
+    for row in df_relations.to_dict(orient="records"):
+        establishment_id = row["establishment_id"]
+        for direction in relation_directions:
+            for type in relation_types:
+                column_nb_name = "%s_%s_nb" % (direction, type)
+                column_part_name = "%s_%s_part" % (direction, type)
+                nb_contract = row[column_nb_name]
+                if row[column_nb_name] > 0:
+                    item = {
+                        "establishment_id" : establishment_id,
+                        "direction": direction,
+                        "type": type,
+                        "nb_contract": nb_contract,
+                        "part_pct": row[column_part_name]
+                    }
+                    relations.append(item)
+    
+    df_relations = pd.DataFrame.from_dict(relations).astype({
+        "establishment_id": str,
+        "direction": "category",
+        "type": "category",
+        "nb_contract": np.int32,
+        "part_pct": float,
+    })
+
+    return df_establishments, df_goods, df_vehicles, df_relations

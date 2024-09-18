@@ -13,22 +13,28 @@ run:
   # - movements.output
   # - data.ugms.raw
   # - data.ugms.cleaned
+  # - data.ugms.output
   # - data.ugms.goods_distributions
   # - data.ugms.vehicles_distributions
   # - vehicles.all
-  - goods.assign
-  - synthesis.matched
+  # - goods.assign
+  # - synthesis.matched
+  # - ssm.ssm
+  # - vrp.problems
+  - vrp.solve
 
 config:
   processes : 16
 
-  sirene_sample_size: 1.00
+  sirene_sample_size: 0.10
 
   regions: []
   departments: [75, 91, 92, 93, 94, 95]
   municipalities: []
 
   sirene_cleaning_method: "horizon"
+
+  output_path: "./.output/"
 
   sirene_compare_method_output: "D:/SOLID/solid-pipeline/.output/"
   sirene_output_path: "D:/SOLID/solid-pipeline/.output/sirene.geojson"
